@@ -1,14 +1,17 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 
-apply plugin: 'kotlin-android'
-
-apply plugin: 'kotlin-android-extensions'
+repositories {
+    maven { url "https://maven.google.com" }
+}
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "journaler.com.journaler"
-        minSdkVersion 19
+        applicationId "com.journaler"
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -20,19 +23,111 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main.java.srcDirs += [
+                'src/main/kotlin',
+                'src/common/kotlin',
+                'src/debug/kotlin',
+                'src/release/kotlin',
+                'src/staging/kotlin',
+                'src/preproduction/kotlin',
+                'src/debug/java',
+                'src/release/java',
+                'src/staging/java',
+                'src/preproduction/java',
+                'src/testDebug/java',
+                'src/testDebug/kotlin',
+                'src/androidTestDebug/java',
+                'src/androidTestDebug/kotlin'
+        ]
+    }
+    signingConfigs {
+        release {
+            storeFile file("Releasing/keystore.jks")
+            storePassword "12345678"
+            keyAlias "key0"
+            keyPassword "12345678"
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+        }
+        staging {
+            debuggable true
+            applicationIdSuffix ".sta"
+        }
+        preproduction {
+            applicationIdSuffix ".pre"
+        }
+        release {
+            debuggable false
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "tier", "minApi"
+    productFlavors {
+        demo {
+            dimension "tier"
+            applicationIdSuffix ".demo"
+            versionNameSuffix "-demo"
+        }
+        complete {
+            dimension "tier"
+            applicationIdSuffix ".complete"
+            versionNameSuffix "-complete"
+        }
+        special {
+            dimension "minApi"
+            applicationIdSuffix ".special"
+            versionNameSuffix "-special"
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.2.41"
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.1.51"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.1.51"
+    implementation "com.android.support:design:26.0.1"
+    implementation "com.android.support:appcompat-v7:26.0.1"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.google.code.gson:gson:2.8.0"
+    implementation "com.github.salomonbrys.kotson:kotson:2.3.0"
+    implementation "com.squareup.retrofit2:retrofit:2.3.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.0.2"
+    implementation "com.squareup.okhttp3:okhttp:3.9.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.9.0"
+
+    implementation "junit:junit:4.12"
+    testImplementation "junit:junit:4.12"
+
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:1.1.51"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib:1.1.51"
+
+    implementation "org.jetbrains.kotlin:kotlin-test:1.1.51"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.1.51"
+
+    implementation "org.jetbrains.kotlin:kotlin-test-junit:1.1.51"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.1.51"
+
+    implementation 'com.android.support:support-annotations:26.0.1'
+    androidTestImplementation 'com.android.support:support-annotations:26.0.1'
+
+    implementation 'com.android.support.test:runner:0.5'
+    androidTestImplementation 'com.android.support.test:runner:0.5'
+
+    implementation 'com.android.support.test:rules:0.5'
+    androidTestImplementation 'com.android.support.test:rules:0.5'
+
+
 }
